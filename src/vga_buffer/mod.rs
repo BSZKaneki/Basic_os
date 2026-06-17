@@ -40,7 +40,7 @@ impl ColorCode {
 #[repr(C)]
 struct ScreenChar {
     ascii_character: u8,
-    
+
     color_code: ColorCode,
 }
 
@@ -70,14 +70,19 @@ impl Writer {
                     self.new_line();
                 }
 
-                let row = BUFFER_HEIGHT - 1;
+                let row = BUFFER_HEIGHT - 2;
                 let col = self.column_position;
-
                 let color_code = self.color_code;
-                self.buffer.chars[row][col] = ScreenChar {
-                    ascii_character: byte,
-                    color_code,
-                };
+                let target_ptr = &mut self.buffer.chars[row][col] as *mut ScreenChar;
+                unsafe {
+                    core::ptr::write_volatile(
+                        target_ptr,
+                        ScreenChar {
+                            ascii_character: byte,
+                            color_code,
+                        },
+                    );
+                }
                 self.column_position += 1;
             }
         }
@@ -85,18 +90,18 @@ impl Writer {
 
     // Shift all lines up by one and clear the last line
     fn new_line(&mut self) {
-    for row in 1..BUFFER_HEIGHT {
-        let src_ptr = &self.buffer.chars[row][0] as *const ScreenChar;
-        let dst_ptr = &mut self.buffer.chars[row - 1][0] as *mut ScreenChar;
+        for row in 1..BUFFER_HEIGHT {
+            let src_ptr = &self.buffer.chars[row][0] as *const ScreenChar;
+            let dst_ptr = &mut self.buffer.chars[row - 1][0] as *mut ScreenChar;
 
-        unsafe {
-            // Copy the entire row at once
-            core::ptr::copy_nonoverlapping(src_ptr, dst_ptr, BUFFER_WIDTH);
+            unsafe {
+                // Copy the entire row at once
+                core::ptr::copy_nonoverlapping(src_ptr, dst_ptr, BUFFER_WIDTH);
+            }
         }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
     }
-    self.clear_row(BUFFER_HEIGHT - 1);
-    self.column_position = 0;
-}
 
     // Clear a row by filling it with spaces
     fn clear_row(&mut self, row: usize) {
@@ -140,7 +145,7 @@ pub fn print_something() {
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
     writer.write_byte(b'H');
     writer.write_string("ello ");
     writer.write_string("Wörld!");

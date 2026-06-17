@@ -12,7 +12,7 @@ use bootloader::BootInfo;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
-    println!("Hello World{}", "!");
+    println!("Hello World");
     print!("Number: {}\n", 42);
     #[cfg(test)]
     test_main();

@@ -3,6 +3,16 @@
 version = 4
 
 [[package]]
+name = "Basic_os"
+version = "0.1.0"
+dependencies = [
+ "bootloader",
+ "lazy_static",
+ "spin 0.5.2",
+ "volatile",
+]
+
+[[package]]
 name = "bootloader"
 version = "0.9.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15,16 +25,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 dependencies = [
  "spin 0.9.8",
-]
-
-[[package]]
-name = "os6"
-version = "0.1.0"
-dependencies = [
- "bootloader",
- "lazy_static",
- "spin 0.5.2",
- "volatile",
 ]
 
 [[package]]
