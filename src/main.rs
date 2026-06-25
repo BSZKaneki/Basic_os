@@ -1,25 +1,34 @@
 #![no_main]
 #![no_std]
+#![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
+#![test_runner(Basic_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-
-mod vga_buffer;
-use core::{any::Any, panic::PanicInfo};
-
+use core::panic::PanicInfo;
 use bootloader::BootInfo;
+use Basic_os::println;
 
 #[unsafe(no_mangle)]
-pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
-    println!("Hello World");
-    print!("Number: {}\n", 42);
+pub extern "C" fn _start(_boot_info: &'static BootInfo) -> ! {
+    Basic_os::init();
+
+    println!("Hello World from our custom architecture!");
+    println!("Numbers: {} and {}", 42, 13.37);
+
+    for i in 0..30 {
+        println!("This is line count: {}", i);
+    }
+
+    println!("We have successfully scrolled!");
+
     #[cfg(test)]
     test_main();
 
     loop {}
 }
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
@@ -27,20 +36,7 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
-    for test in tests {
-        test();
-    }
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    Basic_os::test_panic_handler(info)
 }
-
-#[test_case]
-fn trivial_assertion() {
-    print!("trivial assertion... ");
-    assert_eq!(1, 1);
-    println!("[ok]");
-}
-
-
-
-
