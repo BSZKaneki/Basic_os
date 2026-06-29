@@ -12,15 +12,15 @@ lazy_static! {
             const STACK_SIZE: usize = 4096 * 5;
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
             let stack_start = VirtAddr::from_ptr({ &raw const STACK });
-            stack_start + STACK_SIZE as u64   // ← fix 2
+            stack_start + STACK_SIZE as u64   
         };
         tss
     };
 
     static ref GDT: (GlobalDescriptorTable, Selectors) = {
         let mut gdt = GlobalDescriptorTable::new();
-        let code_selector = gdt.append(Descriptor::kernel_code_segment()); // ← fix 3
-        let tss_selector  = gdt.append(Descriptor::tss_segment(&TSS));     // ← fix 3
+        let code_selector = gdt.append(Descriptor::kernel_code_segment()); 
+        let tss_selector  = gdt.append(Descriptor::tss_segment(&TSS));      
         (gdt, Selectors { code_selector, tss_selector })
     };
 }

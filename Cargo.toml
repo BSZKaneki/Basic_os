@@ -30,3 +30,6 @@ name = "idt_tests"
 
 [[test]]
 name = "vga_tests"
+
+[[test]]
+name = "pic_tests"

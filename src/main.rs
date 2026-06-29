@@ -12,27 +12,30 @@ use Basic_os::println;
 #[unsafe(no_mangle)]
 pub extern "C" fn _start(_boot_info: &'static BootInfo) -> ! {
     Basic_os::init();
+    x86_64::instructions::interrupts::enable();
 
-    println!("Hello World from our custom architecture!");
-    println!("Numbers: {} and {}", 42, 13.37);
-
-    for i in 0..30 {
-        println!("This is line count: {}", i);
-    }
-
-    println!("We have successfully scrolled!");
 
     #[cfg(test)]
     test_main();
 
-    loop {}
+    println!("Starting OS tick counter...");
+    
+    loop {
+        // x86_64::instructions::hlt();
+        
+        // // Clean, safe, and encapsulated function call
+        // let current_ticks = Basic_os::interrupts::timer::get_ticks();
+        
+        // println!("Ticks: {}", current_ticks);
+    }
 }
 
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    loop {
+    }
 }
 
 #[cfg(test)]
